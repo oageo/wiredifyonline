@@ -1,27 +1,37 @@
 <template>
-    <div class="control">
-        <textarea v-model="itext" placeholder="変換元の文章を入力" class="textarea"></textarea>
-        <button class="button" @click="throw_wiredify">変換</button>
-        <textarea v-model="otext" class="textarea" readonly></textarea>
-        <p>{{ itext }}</p>
+    <div>
+        <Woheader />
+        <section class="container my-4">
+                <div class="field">
+                    <input type="text" v-model="itext" placeholder="変換元の文章を入力" class="input" />
+                </div>
+                <div class="field">
+                    <button class="button is-primary is-fullwidth" @click="throw_wiredify">変換</button>
+                </div>
+                <div class="field">
+                    <input type="text" v-model="otext" placeholder="変換後の文章がこちらに表示されます" readonly class="input" />
+                </div>
+        </section>
+        <Wofooter />
     </div>
 </template>
 
 
-<script lang="ts">
+<script setup lang="ts">
 import init, { wiredify } from "wiredify_lib";
 
 onMounted(async () => {
   await init(); 
 });
 
-let inputtext: String = "aaa";
+let itext: String, otext: String;
+let inputtext: String = "";
 let outputtext: String = "";
 
 const throw_wiredify = () => {
-    inputtext = this.itext;
+    inputtext = itext.value;
     outputtext = wiredify(inputtext);
-    this.otext = outputtext;
+    otext.value = outputtext;
 }
 
 </script>
