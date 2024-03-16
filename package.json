@@ -1,0 +1,22 @@
+{
+  "name": "wiredifyonline",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "wasm": "wasm-pack build wiredify_lib --target web",
+    "build": "pnpm wasm && nuxt build",
+    "dev": "pnpm wasm && nuxt dev",
+    "generate": "pnpm wasm && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "nuxt": "^3.10.3",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "vite": "^5.1.6",
+    "vite-plugin-wasm-pack": "^0.1.12"
+  }
+}
