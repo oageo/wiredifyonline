@@ -12,8 +12,8 @@ jobs:
         version: 8.15.4
     - name: Rust toolchain
       uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
+      with:
+        toolchain: stable
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
