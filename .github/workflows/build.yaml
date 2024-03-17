@@ -6,7 +6,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: checkout
+      uses: actions/checkout@v4
     - name: pnpm setup
       uses: pnpm/action-setup
       with:
@@ -22,5 +23,7 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
+      shell: bash
     - name: pnpm build
       run: pnpm build
+      shell: bash
