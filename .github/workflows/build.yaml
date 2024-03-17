@@ -1,6 +1,8 @@
 name: Build
 
-on: [push]
+on: 
+  push
+  pull_request
 
 jobs:
   build:
@@ -8,19 +10,19 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
-    - name: pnpm setup
-      uses: pnpm/action-setup
-      with:
-        version: 8.15.4
-    - name: Rust toolchain
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: stable
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
         cache: 'pnpm'
+    - name: pnpm setup
+      uses: pnpm/action-setup
+      with:
+        version: 8.15.4
+    - name: Rust toolchain
+      uses: dtolnay/rust-toolchain
+      with:
+        toolchain: stable
     - name: Install dependencies
       run: pnpm install
       shell: bash
