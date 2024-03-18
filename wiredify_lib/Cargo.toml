@@ -10,4 +10,4 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2.92"
-wiredify = "0.1.1"
+wiredify = "0.2.0"
