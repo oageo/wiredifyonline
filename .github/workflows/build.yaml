@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: reviewdog/action-setup@v1
+      with:
+        reviewdog_version: latest
     - name: checkout
       uses: actions/checkout@v4
     - name: Use Node.js
