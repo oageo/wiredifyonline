@@ -11,15 +11,16 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "bulma": "^0.9.4",
-    "nuxt": "^3.11.0",
+    "bulma": "^1.0.4",
+    "nuxt": "^3.18.1",
     "nuxt-purgecss": "^2.0.0",
-    "sass": "^1.72.0",
-    "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "sass": "^1.90.0",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "vite": "^5.1.6",
-    "vite-plugin-wasm-pack": "^0.1.12"
+    "vite": "^5.4.19",
+    "vite-plugin-wasm-pack": "^0.1.12",
+    "wasm-pack": "^0.13.1"
   }
 }
