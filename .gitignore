@@ -27,3 +27,6 @@ logs
 
 wiredify_lib/pkg
 wiredify_lib/target
+
+# Claude Code
+.claude

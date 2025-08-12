@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import wasmpack from "vite-plugin-wasm-pack";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -26,6 +27,9 @@ export default defineNuxtConfig({
     "nuxt-purgecss"
   ],
   vite: {
-    plugins: [wasmpack("wiredify_lib")]
+    plugins: [
+      wasm(),
+      topLevelAwait()
+    ]
   }
 })
