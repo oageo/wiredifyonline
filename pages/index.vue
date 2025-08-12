@@ -3,7 +3,7 @@
         <Woheader />
         <section class="container my-4">
                 <div class="field">
-                    <input type="text" v-model="itext" placeholder="変換元の文章を入力" class="input" />
+                    <input type="text" v-model="itext" placeholder="変換元の文章を入力" class="input" @keydown.enter="throw_wiredify" />
                 </div>
                 <div class="field">
                     <button class="button is-primary is-fullwidth" @click="throw_wiredify">変換</button>
@@ -18,19 +18,18 @@
 
 
 <script setup lang="ts">
-import init, { wiredify } from "wiredify_lib";
+import init, { wiredify } from "~/wiredify_lib/pkg/wiredify_lib.js";
+
+const itext = ref("");
+const otext = ref("");
 
 onMounted(async () => {
   await init(); 
 });
 
-let itext: String, otext: String;
-let inputtext: String = "";
-let outputtext: String = "";
-
 const throw_wiredify = () => {
-    inputtext = itext.value;
-    outputtext = wiredify(inputtext);
+    const inputtext = itext.value;
+    const outputtext = wiredify(inputtext);
     otext.value = outputtext;
 }
 

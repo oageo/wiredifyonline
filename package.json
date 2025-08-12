@@ -20,6 +20,8 @@
   },
   "devDependencies": {
     "vite": "^5.4.19",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0",
     "vite-plugin-wasm-pack": "^0.1.12",
     "wasm-pack": "^0.13.1"
   }
