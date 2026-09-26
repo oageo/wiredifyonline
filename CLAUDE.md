@@ -32,7 +32,7 @@ pnpm preview    # ビルド済み成果物のプレビュー（WASM ビルドは
 
 Nuxt 4 だが `app/` ディレクトリは使わず、旧来のルート直下構成（`pages/`・`components/`・`app.vue`）のまま。`app/` を作ると srcDir が切り替わるので注意。
 
-- `pages/index.vue` — 唯一のページ。入力→`wiredify()` 呼び出し→出力の UI とロジックがすべてここにある。
+- `pages/index.vue` — 唯一のページ。変換ボタンはなく、出力は入力からの `computed` でリアルタイムに導出する（WASM 初期化完了を示す `ready` が立つまでは空）。
 - `components/woheader.vue` / `wofooter.vue` — Nuxt の自動インポートで `<Woheader />` / `<Wofooter />` として使われる。
 - `wiredify_lib/` — `wiredify` クレートを `#[wasm_bindgen]` で包むだけの Rust クレート。変換ロジックはすべて外部クレート側にあるため、変換結果の挙動を変えたい場合は `Cargo.toml` の `wiredify` バージョンを上げる。`crate-type = ["cdylib", "rlib"]` は wasm-pack に必須。
 
