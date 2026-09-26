@@ -9,66 +9,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Nuxt.js web application that provides an online interface for the "wiredify" text transformation tool. The project combines a Vue.js frontend with a Rust WebAssembly library to perform text transformations in the browser.
-
-## Architecture
-
-- **Frontend**: Nuxt.js 3 application using Vue 3 and TypeScript
-- **Backend Logic**: Rust library (`wiredify_lib`) compiled to WebAssembly 
-- **Styling**: Bulma CSS framework with PurgeCSS optimization
-- **Package Manager**: pnpm
-
-The application follows a simple architecture:
-1. Main entry point: `app.vue` renders pages
-2. Primary page: `pages/index.vue` contains the text transformation interface
-3. Components: `woheader.vue` and `wofooter.vue` for layout
-4. WASM integration: Rust library in `wiredify_lib/` provides the core transformation logic
+オンラインで [wiredify](https://github.com/oageo/wiredify) を実行するための Nuxt 4 製 Web アプリ。Rust の外部クレート `wiredify`（crates.io）を WebAssembly にコンパイルし、ブラウザ内だけで日本語テキスト変換を行う。サーバーサイドの処理はない。
 
 ## Development Commands
 
+Node.js ^22.19.0 以上（Nuxt 4 の要件）、pnpm 12、Rust ツールチェーン（`wasm32-unknown-unknown` ターゲット）が必要。`wasm-pack` 自体は npm の devDependency として入る。
+
+pnpm 12 は未承認のビルドスクリプトがあると install がエラーになる。許可リストは `pnpm-workspace.yaml` の `allowBuilds` にあり、依存追加で新たに必要になったら `pnpm approve-builds <pkg>` で追加する。
+
 ```bash
-# Install dependencies
-pnpm install
-
-# Build WASM library and start development server
-pnpm dev
-
-# Build WASM library only
-pnpm wasm
-
-# Build for production
-pnpm build
-
-# Generate static site
-pnpm generate
-
-# Preview production build
-pnpm preview
+pnpm install    # postinstall で nuxt prepare も実行される
+pnpm dev        # WASM ビルド → nuxt dev
+pnpm wasm       # WASM ビルドのみ（wasm-pack build wiredify_lib --target web）
+pnpm build      # WASM ビルド → nuxt build
+pnpm generate   # WASM ビルド → 静的サイト生成
+pnpm preview    # ビルド済み成果物のプレビュー（WASM ビルドは走らない）
 ```
 
-## Key Dependencies and Integration
+テストスイート・Linter は存在しない。
 
-- The WASM library must be built before running any Nuxt commands (handled automatically in scripts)
-- Uses `vite-plugin-wasm-pack` to integrate the Rust library
-- Bulma provides all styling - no custom CSS classes needed
-- Application is configured for Japanese language (`lang="ja"`)
+## Architecture
 
-## File Structure Notes
+Nuxt 4 だが `app/` ディレクトリは使わず、旧来のルート直下構成（`pages/`・`components/`・`app.vue`）のまま。`app/` を作ると srcDir が切り替わるので注意。
 
-- `wiredify_lib/`: Rust crate that wraps the external `wiredify` crate for WASM
-- Components use the `Wo` prefix (e.g., `Woheader`, `Wofooter`)
-- Single page application with main functionality in `pages/index.vue`
-- WASM module is initialized on page mount before use
+- `pages/index.vue` — 唯一のページ。入力→`wiredify()` 呼び出し→出力の UI とロジックがすべてここにある。
+- `components/woheader.vue` / `wofooter.vue` — Nuxt の自動インポートで `<Woheader />` / `<Wofooter />` として使われる。
+- `wiredify_lib/` — `wiredify` クレートを `#[wasm_bindgen]` で包むだけの Rust クレート。変換ロジックはすべて外部クレート側にあるため、変換結果の挙動を変えたい場合は `Cargo.toml` の `wiredify` バージョンを上げる。`crate-type = ["cdylib", "rlib"]` は wasm-pack に必須。
 
-## WASM Integration Pattern
+### WASM Integration
 
-The Rust library is imported and initialized in Vue components:
+`wasm-pack build --target web` が `wiredify_lib/pkg/` に JS/WASM を出力する。`pkg/` は gitignore 対象なので、クローン直後や Rust 側を変更した後は `pnpm wasm`（または `pnpm dev`）を実行しないとインポートが解決しない。`nuxt dev` は Rust ソースを監視しない。
+
+出力 JS は `new URL('wiredify_lib_bg.wasm', import.meta.url)` で WASM を取得するため、Vite 標準のアセット処理だけで動き、WASM 用の Vite プラグインは不要（`vite-plugin-top-level-await` は Vite 8 / rolldown と非互換でビルドが失敗するので入れないこと）。インポートはパッケージ名ではなくファイルパスで行う：
+
 ```typescript
-import init, { wiredify } from "wiredify_lib";
+import init, { wiredify } from "~/wiredify_lib/pkg/wiredify_lib.js";
 
 onMounted(async () => {
-  await init(); 
+  await init();  // 完了前に wiredify() を呼ぶと失敗する
 });
 ```
 
-Always ensure WASM is initialized before calling any exported functions.
+### PurgeCSS と Bulma
+
+Bulma は `nuxt.config.ts` の `css: ["bulma"]` でグローバルに読み込んでいる。`nuxt-purgecss` モジュールは Nuxt 4 非対応のため使わず、`nuxt.config.ts` の `$production.postcss.plugins` で `@fullhuman/postcss-purgecss` を直接設定している（本番ビルド時のみ有効、dev では無効）。そのため、JS 側で文字列を組み立てて付与する Bulma クラス名はビルド時に削除される場合がある。テンプレートにリテラルで書いたクラス名は安全。
