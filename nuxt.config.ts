@@ -1,8 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
-
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: [
@@ -23,13 +20,39 @@ export default defineNuxtConfig({
       ]
     }
   },
-  modules: [
-    "nuxt-purgecss"
-  ],
-  vite: {
-    plugins: [
-      wasm(),
-      topLevelAwait()
-    ]
+  // nuxt-purgecss は Nuxt 4 非対応のため、PostCSS プラグインを直接使う（設定は旧モジュールのデフォルト相当）
+  $production: {
+    postcss: {
+      plugins: {
+        "@fullhuman/postcss-purgecss": {
+          content: [
+            "components/**/*.{vue,jsx?,tsx?}",
+            "layouts/**/*.{vue,jsx?,tsx?}",
+            "pages/**/*.{vue,jsx?,tsx?}",
+            "composables/**/*.{vue,jsx?,tsx?}",
+            "app.{vue,jsx?,tsx?}",
+            "plugins/**/*.{js,ts}",
+            "nuxt.config.{js,ts}"
+          ],
+          defaultExtractor: (content: string) => {
+            const contentWithoutStyleBlocks = content.replace(/<style[^]+?<\/style>/gi, "");
+            return contentWithoutStyleBlocks.match(/[\w-.:/]+(?<!:)/g) || [];
+          },
+          safelist: [
+            "body",
+            "html",
+            "nuxt-progress",
+            "__nuxt",
+            /-(leave|enter|appear)(|-(to|from|active))$/,
+            /^nuxt-link(|-exact)-active$/,
+            /^(?!cursor-move).+-move$/,
+            /.*data-v-.*/,
+            /:slotted/,
+            /:deep/,
+            /:global/
+          ]
+        }
+      }
+    }
   }
 })
